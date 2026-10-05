@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "dpdp-xray"
-include(":core")
+include(":core", ":app")

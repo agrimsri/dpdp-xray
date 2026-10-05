@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DPDP X-Ray</string>
+    <string name="a11y_label">DPDP X-Ray consent watcher</string>
+    <string name="a11y_description">Watches only the app you are auditing, only while an audit runs. It reads the consent screen, records the moment you tap Accept or Reject, and can tap Accept/Reject for automated audits. Nothing is uploaded.</string>
+</resources>
