@@ -1,0 +1,139 @@
+[
+  {
+    "id": "firebase-analytics", "kind": "sdk", "title": "Firebase Analytics: start collection only after consent",
+    "appliesTo": ["C1", "C2", "C9", "C10"],
+    "manifest": "<application>\n    <meta-data\n        android:name=\"firebase_analytics_collection_enabled\"\n        android:value=\"false\" />\n</application>",
+    "code": "// After the user taps Accept for analytics:\nFirebase.analytics.setAnalyticsCollectionEnabled(true)\n\n// If the user refuses or withdraws:\nFirebase.analytics.setAnalyticsCollectionEnabled(false)",
+    "steps": ["Use the manifest flag, not a runtime call in Application.onCreate — a runtime call races the automatic first_open event.", "Persist the user's choice and re-apply it on every launch."],
+    "docUrl": "https://firebase.google.com/docs/analytics/android/configure-data-collection", "verified": true
+  },
+  {
+    "id": "crashlytics", "kind": "sdk", "title": "Firebase Crashlytics: opt-in crash reporting",
+    "appliesTo": ["C1", "C2", "C9"],
+    "manifest": "<meta-data\n    android:name=\"firebase_crashlytics_collection_enabled\"\n    android:value=\"false\" />",
+    "code": "// After consent:\nFirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)",
+    "steps": ["If you rely on a legitimate use for crash reporting, document it in your notice."],
+    "docUrl": "https://firebase.google.com/docs/crashlytics/customize-crash-reports", "verified": true
+  },
+  {
+    "id": "facebook", "kind": "sdk", "title": "Meta (Facebook) SDK: delay initialisation and app events",
+    "appliesTo": ["C1", "C2", "C9", "C10"],
+    "manifest": "<meta-data android:name=\"com.facebook.sdk.AutoInitEnabled\" android:value=\"false\" />\n<meta-data android:name=\"com.facebook.sdk.AutoLogAppEventsEnabled\" android:value=\"false\" />\n<meta-data android:name=\"com.facebook.sdk.AdvertiserIDCollectionEnabled\" android:value=\"false\" />",
+    "code": "// After the user taps Accept:\nFacebookSdk.setAutoInitEnabled(true)\nFacebookSdk.fullyInitialize()\nFacebookSdk.setAutoLogAppEventsEnabled(true)\nFacebookSdk.setAdvertiserIDCollectionEnabled(true)",
+    "steps": ["If you call AppEventsLogger.activateApp(), make sure the SDK is initialised first — with auto-init off it is not."],
+    "docUrl": "https://developers.facebook.com/docs/app-events/gdpr-compliance", "verified": true
+  },
+  {
+    "id": "google-mobile-ads", "kind": "sdk", "title": "Google Mobile Ads: gather consent before initialising ads",
+    "appliesTo": ["C1", "C2", "C9", "C10"],
+    "manifest": null,
+    "code": "// Show your consent flow first (e.g. the UMP SDK or your own DPDP notice), then:\nif (userConsentedToAds) {\n    MobileAds.initialize(context)\n}",
+    "steps": ["Do not call MobileAds.initialize() or load ads before the user's choice.", "For child-facing apps, do not serve targeted ads at all (DPDP s.9(3))."],
+    "docUrl": "https://developers.google.com/admob/android/privacy", "verified": false
+  },
+  {
+    "id": "appsflyer", "kind": "sdk", "title": "AppsFlyer: init, but start only after consent",
+    "appliesTo": ["C1", "C2", "C9", "C10"],
+    "manifest": null,
+    "code": "// Application.onCreate():\nAppsFlyerLib.getInstance().init(DEV_KEY, null, this)\n\n// After the user taps Accept:\nAppsFlyerLib.getInstance().start(this)",
+    "steps": ["Do not call start() before consent; use stop(true, context) if consent is withdrawn."],
+    "docUrl": "https://dev.appsflyer.com/hc/docs/android-sdk-reference-appsflyerlib", "verified": false
+  },
+  {
+    "id": "adjust", "kind": "sdk", "title": "Adjust: initialise only after consent",
+    "appliesTo": ["C1", "C2", "C9", "C10"],
+    "manifest": null,
+    "code": "// After the user taps Accept (Adjust SDK v5):\nAdjust.initSdk(adjustConfig)",
+    "steps": ["Move SDK initialisation out of Application.onCreate into your consent callback.", "Check your SDK version's method names in the vendor docs."],
+    "docUrl": "https://dev.adjust.com/en/sdk/android/", "verified": false
+  },
+  {
+    "id": "branch", "kind": "sdk", "title": "Branch: keep tracking disabled until consent",
+    "appliesTo": ["C1", "C2", "C9", "C10"],
+    "manifest": null,
+    "code": "// Before consent:\nBranch.getInstance().disableTracking(true)\n// After the user taps Accept:\nBranch.getInstance().disableTracking(false)",
+    "steps": ["Confirm the exact API for your Branch SDK version."],
+    "docUrl": "https://help.branch.io/developers-hub/docs/android-advanced-features", "verified": false
+  },
+  {
+    "id": "clevertap", "kind": "sdk", "title": "CleverTap: opt out until consent",
+    "appliesTo": ["C1", "C2", "C9"],
+    "manifest": null,
+    "code": "// Before consent:\ncleverTap.setOptOut(true)\n// After the user taps Accept:\ncleverTap.setOptOut(false)",
+    "steps": ["Confirm the opt-out API for your CleverTap SDK version."],
+    "docUrl": "https://developer.clevertap.com/docs/android", "verified": false
+  },
+  {
+    "id": "mixpanel", "kind": "sdk", "title": "Mixpanel: opt out of tracking by default",
+    "appliesTo": ["C1", "C2", "C9"],
+    "manifest": null,
+    "code": "val mixpanel = MixpanelAPI.getInstance(context, TOKEN, /* optOutTrackingDefault = */ true, /* trackAutomaticEvents = */ false)\n// After the user taps Accept:\nmixpanel.optInTracking()",
+    "steps": [],
+    "docUrl": "https://docs.mixpanel.com/docs/tracking-methods/sdks/android", "verified": false
+  },
+  {
+    "id": "amplitude", "kind": "sdk", "title": "Amplitude: start opted out",
+    "appliesTo": ["C1", "C2", "C9"],
+    "manifest": null,
+    "code": "// Create Amplitude with optOut = true in its configuration, then after consent:\namplitude.configuration.optOut = false",
+    "steps": ["Confirm the configuration field for your Amplitude SDK version."],
+    "docUrl": "https://amplitude.com/docs/sdks/analytics/android/android-kotlin-sdk", "verified": false
+  },
+  {
+    "id": "ui-no-consent", "kind": "ui", "title": "Add a DPDP notice and consent screen on first launch",
+    "appliesTo": ["NC"],
+    "manifest": null, "code": null,
+    "steps": ["Show the notice before initialising any non-essential SDK.", "List the personal data, the specific purposes, how to withdraw, and how to complain to the Data Protection Board.", "Record the user's choice with a timestamp (you must be able to prove it — s.6(10))."],
+    "docUrl": null, "verified": true
+  },
+  {
+    "id": "ui-preticked", "kind": "ui", "title": "Default every optional consent toggle to OFF",
+    "appliesTo": ["C3"],
+    "manifest": null,
+    "code": "Checkbox(checked = analyticsConsent, onCheckedChange = { analyticsConsent = it }) // initial value: false",
+    "steps": ["Only the user's own tap may switch a consent option on (clear affirmative action, s.6(1))."],
+    "docUrl": null, "verified": true
+  },
+  {
+    "id": "ui-reject", "kind": "ui", "title": "Make 'Reject' as easy as 'Accept'",
+    "appliesTo": ["C4"],
+    "manifest": null, "code": null,
+    "steps": ["Put a 'Reject' button on the first screen, with the same size and visual weight as 'Accept'.", "Do not hide refusal behind 'Manage' or extra screens.", "Withdrawal later must be equally easy (s.6(4))."],
+    "docUrl": null, "verified": true
+  },
+  {
+    "id": "ui-bundled", "kind": "ui", "title": "Ask for each purpose separately",
+    "appliesTo": ["C5"],
+    "manifest": null, "code": null,
+    "steps": ["Split into separate choices, e.g. Essential (explained, no toggle), Analytics, Personalised offers.", "Store and honour each choice independently."],
+    "docUrl": null, "verified": true
+  },
+  {
+    "id": "ui-notice", "kind": "ui", "title": "Itemise the data and state the purpose",
+    "appliesTo": ["C6"],
+    "manifest": null, "code": null,
+    "steps": ["List each personal data item (e.g. phone number, device ID, purchase history).", "State the specific purpose and the service it enables (Rule 3(b))."],
+    "docUrl": null, "verified": true
+  },
+  {
+    "id": "ui-withdraw", "kind": "ui", "title": "Show how to withdraw consent, use rights and complain",
+    "appliesTo": ["C7"],
+    "manifest": null, "code": null,
+    "steps": ["Add 'You can withdraw consent anytime in Settings › Privacy' with a direct link.", "Explain how to exercise rights and how to complain to the Data Protection Board (Rule 3(c))."],
+    "docUrl": null, "verified": true
+  },
+  {
+    "id": "ui-language", "kind": "ui", "title": "Offer the notice in Indian languages",
+    "appliesTo": ["C8"],
+    "manifest": null, "code": null,
+    "steps": ["Add a language picker for the notice: English plus Hindi and your users' regional languages (Eighth Schedule, s.5(3))."],
+    "docUrl": null, "verified": true
+  },
+  {
+    "id": "ui-children", "kind": "ui", "title": "Child-facing app: no tracking, verifiable parental consent",
+    "appliesTo": ["C9"],
+    "manifest": null, "code": null,
+    "steps": ["Remove or disable ad and behavioural-tracking SDKs for children (s.9(3)).", "Obtain verifiable consent from a parent before processing a child's data (s.9(1))."],
+    "docUrl": null, "verified": true
+  }
+]
